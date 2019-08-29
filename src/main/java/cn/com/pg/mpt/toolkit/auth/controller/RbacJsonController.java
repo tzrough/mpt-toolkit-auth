@@ -8,7 +8,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.OutputStream;
 
 
 @RestController
@@ -19,12 +21,24 @@ public class RbacJsonController {
     private RbacJsonService rbacJsonService;
 
     @GetMapping(value = "excel")
-    public String downloadRbacJson(@RequestParam(name = "filePath", defaultValue = "") String filePath) throws IOException {
+    public void downloadRbacJson(@RequestParam(name = "filePath", defaultValue = "") String filePath, HttpServletResponse response) throws IOException {
 
         XSSFWorkbook xssfWorkbook = new XSSFWorkbook(filePath);
 
         String resultJson = rbacJsonService.convertExcelToJson(xssfWorkbook);
 
-        return resultJson;
+        response.setContentType("application/x-download");
+        response.addHeader("Content-Disposition", "attachment;filename=rbac.json");
+
+        OutputStream out = response.getOutputStream();;
+
+        try{
+            out.write(resultJson.getBytes());
+            out.flush();
+        }catch (Exception e) {
+
+        }finally {
+            out.close();
+        }
     }
 }

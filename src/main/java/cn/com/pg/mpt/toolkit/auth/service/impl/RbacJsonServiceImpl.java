@@ -3,11 +3,16 @@ package cn.com.pg.mpt.toolkit.auth.service.impl;
 import cn.com.pg.mpt.toolkit.auth.entity.RbacAuthElement;
 import cn.com.pg.mpt.toolkit.auth.service.RbacJsonService;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import org.apache.commons.io.FileUtils;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 
+import java.io.FileInputStream;
+import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -57,7 +62,7 @@ public class RbacJsonServiceImpl implements RbacJsonService {
         }
         /** 解析权限点数据 end **/
 
-        resultJson = JSON.toJSONString(rbacAuthElementList);
+        resultJson = JSON.toJSONString(rbacAuthElementList, true);
 
         return resultJson;
     }
