@@ -1,1 +1,29 @@
+server:
+  port: 80
+
+spring:
+  application:
+    name: mpt-toolkit-auth
+  # jsp 配置
+  mvc:
+    view:
+      prefix: /WEB-INF/views/
+      suffix: .jsp
+
+  profiles:
+    active: ${spring_profiles_active:dev}
+
+pagehelper:
+  reasonable: true
+  support-methods-arguments: true
+  params: count=countSql
+  helper-dialect: mysql
+
+
+# mybatis-plus mapper xml 文件地址
+mybatis-plus:
+  config-location: classpath:mybatis/mybatis-config.xml
+  mapper-locations: classpath*:mybatis/mapper/*.xml
+  type-aliases-package: cn.com.pg.mpt.toolkit.auth.entity
+
 

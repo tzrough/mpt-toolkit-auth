@@ -3,17 +3,17 @@ package cn.com.pg.mpt.toolkit.auth.controller;
 import cn.com.pg.mpt.toolkit.auth.service.RbacJsonService;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStream;
 
 
-@RestController
+@Controller
 @RequestMapping(value = "/rbac-json")
 public class RbacJsonController {
 
