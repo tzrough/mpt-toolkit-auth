@@ -1,6 +1,6 @@
 package cn.com.pg.mpt.toolkit.auth.controller;
 
-import cn.com.pg.mpt.toolkit.auth.service.RbacJsonService;
+import cn.com.pg.mpt.toolkit.auth.service.RbacFileService;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -14,18 +14,30 @@ import java.io.OutputStream;
 
 
 @Controller
-@RequestMapping(value = "/rbac-json")
-public class RbacJsonController {
+@RequestMapping(value = "/rbac-file")
+public class RbacFileController {
 
     @Autowired
-    private RbacJsonService rbacJsonService;
+    private RbacFileService rbacFileService;
 
-    @GetMapping(value = "excel")
-    public void downloadRbacJson(@RequestParam(name = "filePath", defaultValue = "") String filePath, HttpServletResponse response) throws IOException {
+
+    @GetMapping(value = "excel-upload")
+    public void excelUpload(@RequestParam(name = "filePath", defaultValue = "") String filePath, HttpServletResponse response) throws IOException {
 
         XSSFWorkbook xssfWorkbook = new XSSFWorkbook(filePath);
 
-        String resultJson = rbacJsonService.convertExcelToJson(xssfWorkbook);
+        rbacFileService.saveExcel2DB(xssfWorkbook);
+
+
+    }
+
+
+    @GetMapping(value = "excel-json")
+    public void excel2Json(@RequestParam(name = "filePath", defaultValue = "") String filePath, HttpServletResponse response) throws IOException {
+
+        XSSFWorkbook xssfWorkbook = new XSSFWorkbook(filePath);
+
+        String resultJson = rbacFileService.convertExcel2Json(xssfWorkbook);
 
         response.setContentType("application/x-download");
         response.addHeader("Content-Disposition", "attachment;filename=rbac.json");

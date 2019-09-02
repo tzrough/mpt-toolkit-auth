@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.com.pg.mpt.toolkit.auth.dao.AuthClassElementDao">
+  <resultMap id="BaseResultMap" type="cn.com.pg.mpt.toolkit.auth.entity.AuthClassElement">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="auth_class_id" jdbcType="BIGINT" property="authClassId" />
+    <result column="auth_element_name" jdbcType="VARCHAR" property="authElementName" />
+    <result column="auth_element" jdbcType="VARCHAR" property="authElement" />
+    <result column="version" jdbcType="INTEGER" property="version" />
+    <result column="created_at" jdbcType="TIMESTAMP" property="createdAt" />
+    <result column="created_by" jdbcType="VARCHAR" property="createdBy" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, auth_class_id, auth_element_name, auth_element, version, created_at, created_by
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from auth_class_element
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from auth_class_element
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+
+  <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="cn.com.pg.mpt.toolkit.auth.entity.AuthClassElement" useGeneratedKeys="true">
+    insert into auth_class_element
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="auth_class_id != null">
+        auth_class_id,
+      </if>
+      <if test="authElementName != null">
+        auth_element_name,
+      </if>
+      <if test="authElement != null">
+        auth_element,
+      </if>
+      <if test="version != null">
+        version,
+      </if>
+      <if test="createdAt != null">
+        created_at,
+      </if>
+      <if test="createdBy != null">
+        created_by,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="auth_class_id != null">
+        #{authClassId,jdbcType=BIGINT},
+      </if>
+      <if test="authElementName != null">
+        #{authElementName,jdbcType=VARCHAR},
+      </if>
+      <if test="authElement != null">
+        #{authElement,jdbcType=VARCHAR},
+      </if>
+      <if test="version != null">
+        #{version,jdbcType=INTEGER},
+      </if>
+      <if test="createdAt != null">
+        #{createdAt,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createdBy != null">
+        #{createdBy,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="cn.com.pg.mpt.toolkit.auth.entity.AuthClassElement">
+    update auth_class_element
+    <set>
+      <if test="auth_class_id != null">
+        auth_class_id = #{authClassId,jdbcType=BIGINT},
+      </if>
+      <if test="authElementName != null">
+        auth_element_name = #{authElementName,jdbcType=VARCHAR},
+      </if>
+      <if test="authElement != null">
+        auth_element = #{authElement,jdbcType=VARCHAR},
+      </if>
+      <if test="version != null">
+        version = #{version,jdbcType=INTEGER},
+      </if>
+      <if test="createdAt != null">
+        created_at = #{createdAt,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createdBy != null">
+        created_by = #{createdBy,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+
+  <update id="updateByPrimaryKey" parameterType="cn.com.pg.mpt.toolkit.auth.entity.AuthClassElement">
+    update auth_class_element
+    set auth_class_id = #{authClassId,jdbcType=BIGINT},
+      auth_element_name = #{authElementName,jdbcType=VARCHAR},
+      auth_element = #{authElement,jdbcType=VARCHAR},
+      version = #{version,jdbcType=INTEGER},
+      created_at = #{createdAt,jdbcType=TIMESTAMP},
+      created_by = #{createdBy,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+
+  <!-- 检查权限点表是否存在 -->
+  <select id="tableExisted" parameterType="String" resultType="Boolean">
+    select count(1) from information_schema.TABLES
+    where table_schema = #{dbName}
+    and LCASE(table_name) like CONCAT(#{tableNamePre},'%')
+  </select>
+
+  <!-- 创建权限点表 -->
+  <update id="createTable" parameterType="String">
+    CREATE TABLE #{tableName} (
+    `id` bigint(11) NOT NULL AUTO_INCREMENT COMMENT '主键 id',
+    `auth_class_id` bigint(11) NOT NULL COMMENT '关联 auth class id',
+    `auth_element_name` varchar(128) NOT NULL COMMENT '权限点元素名称',
+    `auth_element` varchar(64) NOT NULL COMMENT '权限点元素',
+    `version` int(11) NOT NULL COMMENT '权限点版本号(全量升级 与class表 verison 对应)',
+    `created_at` datetime DEFAULT NULL,
+    `created_by` varchar(64) CHARACTER SET utf8 DEFAULT 'default',
+    PRIMARY KEY (`id`) USING BTREE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+  </update>
+
+</mapper>

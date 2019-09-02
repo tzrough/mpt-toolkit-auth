@@ -1,10 +1,10 @@
-package cn.com.pg.mpt.toolkit.auth.entity;
+package cn.com.pg.mpt.toolkit.auth.model;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import lombok.Data;
 
 @Data
-public class RbacAuthElement {
+public class AuthJsonElement {
 
     @JSONField(ordinal = 1)
     private String name;
