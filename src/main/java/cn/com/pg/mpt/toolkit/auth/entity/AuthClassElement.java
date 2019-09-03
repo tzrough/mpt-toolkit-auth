@@ -33,10 +33,8 @@ public class AuthClassElement extends BaseEntity implements Serializable {
     private String authElement;
 
     /**
-     * 权限点版本号(全量升级 与class表 verison 对应)
+     * 权限点表名
      */
     @NotNull
-    @TableField(value = "version")
-    private Integer version;
-
+    private String tableName;
 }

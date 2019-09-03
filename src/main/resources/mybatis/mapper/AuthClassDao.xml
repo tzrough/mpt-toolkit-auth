@@ -32,8 +32,8 @@
   </delete>
 
   <!-- 插入或更新权限模块 -->
-  <insert id="replaceAuthClass" keyColumn="id" keyProperty="id" parameterType="cn.com.pg.mpt.toolkit.auth.entity.AuthClass" useGeneratedKeys="true">
-    replace into auth_class
+  <insert id="insertAuthClass" keyColumn="id" keyProperty="id" parameterType="cn.com.pg.mpt.toolkit.auth.entity.AuthClass" useGeneratedKeys="true">
+    insert into auth_class
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="authServiceName != null">
         auth_service_name,

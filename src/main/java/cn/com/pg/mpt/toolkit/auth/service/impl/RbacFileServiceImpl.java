@@ -40,7 +40,7 @@ public class RbacFileServiceImpl implements RbacFileService {
         // 更新版本号并入库
         int version = authClassDao.getMaxVersion(authClass) + 1;
         authClass.setVersion(version);
-        long authClassId = authClassDao.replaceAuthClass(authClass);
+        authClassDao.insertAuthClass(authClass);
 
         // 解析权限点数据
         List<AuthClassElement> authClassElements = this.extractAuthList(authDataSheet);
@@ -55,8 +55,8 @@ public class RbacFileServiceImpl implements RbacFileService {
 
         // 2. 插入权限点数据
         for (AuthClassElement authClassElement : authClassElements) {
-
-            authClassElement.setAuthClassId(authClassId);
+            authClassElement.setTableName(tableName);
+            authClassElement.setAuthClassId(authClass.getId());
             authClassElementDao.insertSelective(authClassElement);
         }
     }

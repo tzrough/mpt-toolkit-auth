@@ -20,7 +20,7 @@ public interface AuthClassDao {
     /**
      * 插入或更新权限模块
      **/
-    int replaceAuthClass(AuthClass record);
+    int insertAuthClass(AuthClass record);
 
     int deleteByPrimaryKey(Long id);
 }
