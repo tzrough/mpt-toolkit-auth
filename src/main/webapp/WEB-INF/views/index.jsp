@@ -38,7 +38,7 @@
     <div class="panel-group" id="panelParent">
         <div class="panel panel-info">
             <div class="panel-heading">
-                <h4 class="panel-title" data-toggle="collapse" data-parent="#panelParent" href="#funcAuthDiv">
+                <h4 id="funcAuthHeader" class="panel-title" data-toggle="collapse" data-parent="#panelParent" href="#funcAuthDiv">
                     <a href="#">功能权限 </a>
                 </h4>
             </div>
@@ -58,11 +58,11 @@
 
         <div class="panel panel-info">
             <div class="panel-heading">
-                <h4 class="panel-title" data-toggle="collapse" data-parent="#panelParent" href="#dataAuthTable">
+                <h4 id="dataAuthHeader" class="panel-title" data-toggle="collapse" data-parent="#panelParent" href="#dataAuthDiv">
                     <a href="#">数据权限 </a>
                 </h4>
             </div>
-            <div id="dataAuthTable" class="panel-collapse collapse">
+            <div id="dataAuthDiv" class="panel-collapse collapse">
             </div>
         </div>
     </div>

@@ -6,11 +6,12 @@
     <result column="auth_class_id" jdbcType="BIGINT" property="authClassId" />
     <result column="auth_element_name" jdbcType="VARCHAR" property="authElementName" />
     <result column="auth_element" jdbcType="VARCHAR" property="authElement" />
+    <result column="rbac_key" jdbcType="VARCHAR" property="rbacKey" />
     <result column="created_at" jdbcType="TIMESTAMP" property="createdAt" />
     <result column="created_by" jdbcType="VARCHAR" property="createdBy" />
   </resultMap>
   <sql id="Base_Column_List">
-    id, auth_class_id, auth_element_name, auth_element, created_at, created_by
+    id, auth_class_id, auth_element_name, auth_element, rbac_key, created_at, created_by
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
     select 
@@ -18,10 +19,6 @@
     from auth_class_element
     where id = #{id,jdbcType=BIGINT}
   </select>
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
-    delete from auth_class_element
-    where id = #{id,jdbcType=BIGINT}
-  </delete>
 
   <insert id="insertSelective" keyProperty="id" parameterType="cn.com.pg.mpt.toolkit.auth.entity.AuthClassElement" useGeneratedKeys="true">
     insert into ${tableName}
@@ -34,6 +31,9 @@
       </if>
       <if test="authElement != null">
         auth_element,
+      </if>
+      <if test="rbacKey != null">
+        rbac_key,
       </if>
       <if test="createdAt != null">
         created_at,
@@ -51,6 +51,9 @@
       </if>
       <if test="authElement != null">
         #{authElement,jdbcType=VARCHAR},
+      </if>
+      <if test="rbacKey != null">
+        #{rbacKey,jdbcType=VARCHAR},
       </if>
       <if test="createdAt != null">
         #{createdAt,jdbcType=TIMESTAMP},
@@ -72,6 +75,9 @@
       <if test="authElement != null">
         auth_element = #{authElement,jdbcType=VARCHAR},
       </if>
+      <if test="rbacKey != null">
+        rbac_key = #{rbacKey,jdbcType=VARCHAR},
+      </if>
       <if test="createdAt != null">
         created_at = #{createdAt,jdbcType=TIMESTAMP},
       </if>
@@ -87,6 +93,7 @@
     set auth_class_id = #{authClassId,jdbcType=BIGINT},
       auth_element_name = #{authElementName,jdbcType=VARCHAR},
       auth_element = #{authElement,jdbcType=VARCHAR},
+      rbac_key = #{rbacKey,jdbcType=VARCHAR},
       created_at = #{createdAt,jdbcType=TIMESTAMP},
       created_by = #{createdBy,jdbcType=VARCHAR}
     where id = #{id,jdbcType=BIGINT}
@@ -106,10 +113,16 @@
     `auth_class_id` bigint(11) NOT NULL COMMENT '关联 auth class id',
     `auth_element_name` varchar(128) NOT NULL COMMENT '权限点元素名称',
     `auth_element` varchar(64) NOT NULL COMMENT '权限点元素',
+    `rbac_key` varchar(256) NOT NULL COMMENT 'rbac json的key',
     `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
     `created_by` varchar(64) CHARACTER SET utf8 DEFAULT 'default',
     PRIMARY KEY (`id`) USING BTREE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
   </update>
+
+  <!-- 获取权限模块下权限点 -->
+  <select id="getAuthClassElmenetList" parameterType="cn.com.pg.mpt.toolkit.auth.entity.AuthClass" resultType="cn.com.pg.mpt.toolkit.auth.entity.AuthClassElement">
+    SELECT * FROM ${authTableName} WHERE auth_class_id = #{id};
+  </select>
 
 </mapper>

@@ -7,6 +7,7 @@
     <result column="auth_type" jdbcType="INTEGER" property="authType" />
     <result column="auth_range" jdbcType="VARCHAR" property="authRange" />
     <result column="auth_ch_name" jdbcType="VARCHAR" property="authChName" />
+    <result column="auth_table_name" jdbcType="VARCHAR" property="authTableName" />
     <result column="is_deleted" jdbcType="INTEGER" property="isDeleted" />
     <result column="version" jdbcType="INTEGER" property="version" />
     <result column="created_at" jdbcType="TIMESTAMP" property="createdAt" />
@@ -17,7 +18,7 @@
     <result column="deleted_by" jdbcType="VARCHAR" property="deletedBy" />
   </resultMap>
   <sql id="Base_Column_List">
-    id, auth_service_name, auth_type, auth_range, auth_ch_name, is_deleted,
+    id, auth_service_name, auth_type, auth_range, auth_ch_name, auth_table_name, is_deleted,
     version, created_at, created_by, updated_at, updated_by, deleted_at, deleted_by
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
@@ -26,10 +27,6 @@
     from auth_class
     where id = #{id,jdbcType=BIGINT}
   </select>
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
-    delete from auth_class
-    where id = #{id,jdbcType=BIGINT}
-  </delete>
 
   <!-- 插入或更新权限模块 -->
   <insert id="insertAuthClass" keyColumn="id" keyProperty="id" parameterType="cn.com.pg.mpt.toolkit.auth.entity.AuthClass" useGeneratedKeys="true">
@@ -46,6 +43,9 @@
       </if>
       <if test="authChName != null">
         auth_ch_name,
+      </if>
+      <if test="authTableName != null">
+        auth_table_name,
       </if>
       <if test="isDeleted != null">
         is_deleted,
@@ -84,6 +84,9 @@
       </if>
       <if test="authChName != null">
         #{authChName,jdbcType=VARCHAR},
+      </if>
+      <if test="authTableName != null">
+        #{authTableName,jdbcType=VARCHAR},
       </if>
       <if test="isDeleted != null">
         #{isDeleted,jdbcType=INTEGER},
@@ -127,6 +130,9 @@
       <if test="authChName != null">
         auth_ch_name = #{authChName,jdbcType=VARCHAR},
       </if>
+      <if test="authTableName != null">
+        auth_table_name,
+      </if>
       <if test="isDeleted != null">
         is_deleted = #{isDeleted,jdbcType=INTEGER},
       </if>
@@ -160,6 +166,7 @@
       auth_type = #{authType,jdbcType=INTEGER},
       auth_range = #{authRange,jdbcType=VARCHAR},
       auth_ch_name = #{authChName,jdbcType=VARCHAR},
+      auth_table_name = #{authTableName,jdbcType=VARCHAR},
       is_deleted = #{isDeleted,jdbcType=INTEGER},
       version = #{version,jdbcType=INTEGER},
       created_at = #{createdAt,jdbcType=TIMESTAMP},
@@ -181,6 +188,27 @@
       auth_type = #{authType,jdbcType=INTEGER}
       and
       auth_range = #{authRange,jdbcType=VARCHAR}
+  </select>
+
+
+  <!-- 获取服务列表 -->
+  <select id="getServiceList" resultType="cn.com.pg.mpt.toolkit.auth.entity.AuthClass">
+    SELECT distinct(auth_service_name) FROM auth_class WHERE is_deleted = 0
+  </select>
+
+  <!-- 获取权限模块列表 -->
+  <select id="getAuthClassList" parameterType="cn.com.pg.mpt.toolkit.auth.entity.AuthClass" resultType="cn.com.pg.mpt.toolkit.auth.entity.AuthClass">
+    SELECT * FROM auth_class t1
+    INNER JOIN
+      (SELECT MAX(id) AS id FROM
+          auth_class
+      WHERE
+          auth_service_name = #{authServiceName}
+          AND auth_type = #{authType}
+          AND is_deleted = #{isDeleted}
+      GROUP BY auth_range) t2
+    WHERE t1.id = t2.id
+    ORDER BY t1.created_at;
   </select>
 
 </mapper>

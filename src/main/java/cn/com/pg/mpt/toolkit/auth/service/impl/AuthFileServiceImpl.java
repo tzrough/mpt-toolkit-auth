@@ -46,7 +46,7 @@ public class AuthFileServiceImpl implements AuthFileService {
         List<AuthClassElement> authClassElements = this.extractAuthList(authDataSheet);
 
         String dbName = "mpt_toolkit_auth";
-        String tableName = authClass.getTableName();
+        String tableName = authClass.getAuthTableName();
 
         // 1. 若权限点表不存在, 则先创建权限点表
         if(!authClassElementDao.tableExisted(dbName, tableName)) {
@@ -78,8 +78,22 @@ public class AuthFileServiceImpl implements AuthFileService {
         List<AuthClassElement> authClassElements = this.extractAuthList(authDataSheet);
 
         if(!CollectionUtils.isEmpty(authClassElements)) {
+
+            int authTypeCode = authClass.getAuthType();
+            String authTypeKey = "";
+
+            switch (authTypeCode) {
+                case 1:
+                    authTypeKey = AuthType.FUNC.getKey();
+                    break;
+                case 2:
+                    authTypeKey = AuthType.DATA.getKey();
+                    break;
+                default:
+            }
+
             // 替换表名为 JSON KEY 前缀
-            String keyPrefix = authClass.getAuthServiceName() + "." + authClass.getAuthType() + "." + authClass.getAuthRange();
+            String keyPrefix = authClass.getAuthServiceName() + "." + authTypeKey + "." + authClass.getAuthRange();
 
             for (AuthClassElement ele : authClassElements) {
                 AuthJsonElement authJsonElement = new AuthJsonElement();
@@ -115,8 +129,10 @@ public class AuthFileServiceImpl implements AuthFileService {
         switch (authType) {
             case "function":
                 authTypeCode = AuthType.FUNC.getCode();
+                break;
             case "data":
                 authTypeCode = AuthType.DATA.getCode();
+                break;
             default:
         }
 
@@ -124,7 +140,7 @@ public class AuthFileServiceImpl implements AuthFileService {
         rbacAuth.setAuthType(authTypeCode);
         rbacAuth.setAuthRange(authRange);
         rbacAuth.setAuthChName(authChName);
-        rbacAuth.setTableName(authTableName);
+        rbacAuth.setAuthTableName(authTableName);
 
         return rbacAuth;
     }

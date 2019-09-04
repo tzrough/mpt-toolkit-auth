@@ -33,6 +33,13 @@ public class AuthClassElement extends BaseEntity implements Serializable {
     private String authElement;
 
     /**
+     * RBAC json中的key
+     */
+    @NotNull
+    @TableField(value = "rbac_key")
+    private String rbacKey;
+
+    /**
      * 权限点表名
      */
     @NotNull

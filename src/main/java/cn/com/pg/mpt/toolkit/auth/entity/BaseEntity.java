@@ -37,7 +37,7 @@ public class BaseEntity {
     private String deletedBy;
 
     /**
-     * 是否删除 0: 删除 1: 未删除
+     * 是否删除 1: 删除 0: 未删除
      */
     @TableField(value = "is_deleted")
     private Integer isDeleted;

@@ -53,6 +53,7 @@ public class AuthClass extends BaseEntity implements Serializable {
      * 权限点表名
      */
     @NotNull
-    private String tableName;
+    @TableField(value = "auth_table_name")
+    private String authTableName;
 
 }

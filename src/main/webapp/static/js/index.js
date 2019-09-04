@@ -1,5 +1,8 @@
 $(function(){
+    // 获取所有权限列表
     getAuthServiceList();
+    // 初始化权限模块折叠功能
+    initAuthClassList();
 });
 
 /**
@@ -35,28 +38,64 @@ function getAuthServiceList() {
                 // 权限类型  1: 功能权限  2: 数据权限
                 var authType = 1;
 
-                $("#serviceList").append("<li><a onclick='getAuthClassList(\""+serviceName+"\","+authType+")'>" + serviceName + "</a></li>");
+                // 默认第一个选中
+                if(i == 0)
+                    //$("#serviceList").append("<li class='active'><a onclick='getAuthClassList(\""+serviceName+"\","+authType+")'>" + serviceName + "</a></li>");
+                    $("#serviceList").append("<li class='active'><a onclick='getAuthClassList(this," + authType + ")'>" + serviceName + "</a></li>");
+                else
+                    $("#serviceList").append("<li><a onclick='getAuthClassList(this," + authType + ")'>" + serviceName + "</a></li>");
             });
         },
         error:function(){
 
         }
     });
+
 }
+
+
+/**
+ * 初始化权限模块折叠功能
+ */
+function initAuthClassList() {
+
+    $('#funcAuthDiv').on('show.bs.collapse', function () {
+        getAuthClassList(null, 1);
+    });
+
+    $('#dataAuthDiv').on('show.bs.collapse', function () {
+        getAuthClassList(null, 2);
+    });
+
+}
+
 
 /**
  * 获取指定 service 下权限模块
  *
- * serviceName  所属服务名
  * authType     权限类型  1: 功能权限  2: 数据权限
  *
  **/
-function getAuthClassList(serviceName, authType)
+function getAuthClassList(_this, authType)
 {
-    var url =  "/auth-service/" + serviceName + "/" + authType;
+    if(_this != null) {
+        $("#serviceList").children().removeClass("active");
+        $(_this).parents().addClass("active");
+    }
+
+    var serviceName = $("#serviceList").children(".active").find("a").html();
+    var url = "/auth-service/auth-class";
+
+    var condition = {};
+    condition.authServiceName = serviceName;
+    condition.authType = authType;
+    condition.isDeleted = 0;
 
     $.ajax({
         url: url,
+        type: "post",
+        data: JSON.stringify(condition),
+        contentType : "application/json",
         dataType:"json",
         success:function(authClassList){
             var authClassListHtml = "";
@@ -68,7 +107,7 @@ function getAuthClassList(serviceName, authType)
 
                 authClassListHtml +=
                 '<div>' +
-                    '<a class="list-group-item" href="#" onclick="getAuthClassElement(this,' + divId + ')">' + item.authChName + '</a>' +
+                    '<a class="list-group-item" href="#" onclick="getAuthClassElement(this)" classId=' + authClassId + ' tableName=' + item.authTableName + ' >' + item.authChName + '</a>' +
                     '<div id=' + divId + '>' +
                         '<table id=' + tableId + '> </table>' +
                     '</div>' +
@@ -80,11 +119,17 @@ function getAuthClassList(serviceName, authType)
                 // 功能权限
                 case 1 :
                     $('#funcAuthDiv').empty();
+                    $('#dataAuthDiv').empty();
                     $('#funcAuthDiv').append(authClassListHtml);
+                    $('#funcAuthDiv').collapse('show');
+                    break;
                 // 数据权限
                 case 2 :
+                    $('#funcAuthDiv').empty();
                     $('#dataAuthDiv').empty();
                     $('#dataAuthDiv').append(authClassListHtml);
+                    $('#dataAuthDiv').collapse('show');
+                    break;
             }
         },
         error:function(){
@@ -94,12 +139,11 @@ function getAuthClassList(serviceName, authType)
 }
 
 
-
 /**
  * 获取指定权限模块下权限点
  **/
-function getAuthClassElement(_this, divId) {
-    var data = [
+function getAuthClassElement(_this) {
+ /*   var data = [
         {
             'id': 0,
             'name': 'Item 0',
@@ -130,33 +174,78 @@ function getAuthClassElement(_this, divId) {
             'name': 'Item 5',
             'price': '$5'
         }
-    ]
+    ]*/
 
     var $tableDiv = $($(_this).next());
     var $table = $($(_this).next().children("table"));
 
-    // 未点击状态
+    var url = "/auth-class/element"
+    var condition = {};
+    condition.id = $(_this).attr("classId");
+    condition.authTableName = $(_this).attr("tableName");
+
+    // 点击状态
     if($(_this).hasClass("active")) {
         $(_this).removeClass("active");
         $tableDiv.hide();
-        // 点击状态
+    // 未点击状态
     } else {
-        $(_this).addClass("active");
         $table.bootstrapTable({
-            data: data,
-            pagination: true,
-            height: 500,
+            url: url,
+            method: "post",
+            queryParams: function (params) {
+                return condition;
+            },
+            pagination: false,
             columns: [{
-                field: 'id',
-                title: 'Item ID'
+            title: 'Number',
+            formatter: function (value, row, index) {
+                return index+1;
+            }}, {
+                field: 'authElementName',
+                title: 'Auth Element Name'
             }, {
-                field: 'name',
-                title: 'Item Name'
+                field: 'authElement',
+                title: 'Auth Element'
             }, {
-                field: 'price',
-                title: 'Item Price'
-            }, ]
+                field: 'createdAt',
+                title: 'Last Updated At'
+            } ],
+            height: 400,
         });
+
+        $(_this).addClass("active");
         $tableDiv.show();
+
+    /*    $.ajax({
+            url: url,
+            type: "post",
+            data: JSON.stringify(condition),
+            contentType : "application/json",
+            dataType:"json",
+            success:function(authClassElementList){
+                $table.bootstrapTable({
+                    data: authClassElementList,
+                    pagination: true,
+                    height: 500,
+                    columns: [{
+                        field: 'id',
+                        title: 'Item ID'
+                    }, {
+                        field: 'name',
+                        title: 'Item Name'
+                    }, {
+                        field: 'price',
+                        title: 'Item Price'
+                    }, ]
+                });
+
+            },
+            error:function(){
+
+            }
+        });*/
+
+
     }
 }
