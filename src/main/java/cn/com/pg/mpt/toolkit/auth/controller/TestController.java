@@ -13,6 +13,6 @@ public class TestController {
 
         request.setAttribute("user", "zhangsan");
 
-        return "index";
+        return "index1";
     }
 }

@@ -55,8 +55,10 @@ public class AuthFileServiceImpl implements AuthFileService {
 
         // 2. 插入权限点数据
         for (AuthClassElement authClassElement : authClassElements) {
+            String keyPrefix = generateRbacKeyPrefix(authClass);
             authClassElement.setTableName(tableName);
             authClassElement.setAuthClassId(authClass.getId());
+            authClassElement.setRbacKey(keyPrefix + authClassElement.getAuthElement());
             authClassElementDao.insertSelective(authClassElement);
         }
     }
@@ -78,27 +80,13 @@ public class AuthFileServiceImpl implements AuthFileService {
         List<AuthClassElement> authClassElements = this.extractAuthList(authDataSheet);
 
         if(!CollectionUtils.isEmpty(authClassElements)) {
-
-            int authTypeCode = authClass.getAuthType();
-            String authTypeKey = "";
-
-            switch (authTypeCode) {
-                case 1:
-                    authTypeKey = AuthType.FUNC.getKey();
-                    break;
-                case 2:
-                    authTypeKey = AuthType.DATA.getKey();
-                    break;
-                default:
-            }
-
-            // 替换表名为 JSON KEY 前缀
-            String keyPrefix = authClass.getAuthServiceName() + "." + authTypeKey + "." + authClass.getAuthRange();
+            // 生成 JSON KEY 前缀  format: serviceName.type.range.*
+            String keyPrefix = this.generateRbacKeyPrefix(authClass);
 
             for (AuthClassElement ele : authClassElements) {
                 AuthJsonElement authJsonElement = new AuthJsonElement();
 
-                authJsonElement.setKey(keyPrefix + "." + ele.getAuthElement());
+                authJsonElement.setKey(keyPrefix + ele.getAuthElement());
                 authJsonElement.setName(ele.getAuthElementName());
 
                 authJsonElementList.add(authJsonElement);
@@ -171,5 +159,31 @@ public class AuthFileServiceImpl implements AuthFileService {
         }
 
         return authClassElements;
+    }
+
+    /** 获取 rbac key 前缀 **/
+    private String generateRbacKeyPrefix(AuthClass authClass) {
+
+        StringBuffer keyPrefix = new StringBuffer();
+        String authTypeKey = "";
+
+        switch (authClass.getAuthType()) {
+            case 1:
+                authTypeKey = AuthType.FUNC.getKey();
+                break;
+            case 2:
+                authTypeKey = AuthType.DATA.getKey();
+                break;
+            default:
+        }
+
+        keyPrefix.append(authClass.getAuthServiceName());
+        keyPrefix.append(".");
+        keyPrefix.append(authTypeKey);
+        keyPrefix.append(".");
+        keyPrefix.append(authClass.getAuthRange());
+        keyPrefix.append(".");
+
+        return keyPrefix.toString();
     }
 }

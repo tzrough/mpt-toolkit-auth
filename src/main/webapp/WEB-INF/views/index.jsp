@@ -43,16 +43,16 @@
                 </h4>
             </div>
             <div id="funcAuthDiv" class="panel-collapse collapse in">
- <%--               <div>
-                    <a class="list-group-item" href="#" onclick="getAuthClassElement(this)">SVN</a>
-                    <div id="test">
-                        <table id="funcAuthTable"></table>
-                    </div>
-                </div>
-                <div class="list-group-item">
-                    <a class="active" href="#" onclick="getAuthClassElement(this)">GIT</a>
-                    <table id="funcAuthTable1"></table>
-                </div>--%>
+                <%--               <div>
+                                   <a class="list-group-item" href="#" onclick="getAuthClassElement(this)">SVN</a>
+                                   <div id="test">
+                                       <table id="funcAuthTable"></table>
+                                   </div>
+                               </div>
+                               <div class="list-group-item">
+                                   <a class="active" href="#" onclick="getAuthClassElement(this)">GIT</a>
+                                   <table id="funcAuthTable1"></table>
+                               </div>--%>
             </div>
         </div>
 

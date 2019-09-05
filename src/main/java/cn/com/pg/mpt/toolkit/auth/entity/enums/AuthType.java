@@ -10,6 +10,7 @@ public enum AuthType {
     private Integer code;
 
     AuthType(String key, Integer code) {
+        this.key = key;
         this.code = code;
     }
 

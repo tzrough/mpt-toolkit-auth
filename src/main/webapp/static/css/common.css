@@ -7,3 +7,22 @@
 { margin-right: 10px}
 .bottom10
 { margin-bottom: 10px}
+
+.top50
+{ margin-top: 50px}
+.left50
+{ margin-left: 50px}
+.right50
+{ margin-right: 50px}
+.bottom50
+{ margin-bottom: 50px}
+
+
+.border
+{
+border-top: 4px groove #5bc0de;
+border-left: 4px groove #5bc0de;
+border-right: 4px groove #5bc0de;
+border-bottom: 4px groove #5bc0de;
+height: 100%;
+}

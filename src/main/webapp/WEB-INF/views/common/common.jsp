@@ -13,6 +13,7 @@
     <script src="${ctx}/static/js/jquery-3.4.1.min.js"></script>
     <script src="${ctx}/static/js/bootstrap.min.js"></script>
     <script src="${ctx}/static/js/bootstrap-table.min.js"></script>
+    <script src="${ctx}/static/js/common/common.js"></script>
 
 </head>
 </html>
