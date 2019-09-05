@@ -57,7 +57,6 @@ function getAuthClassList(authType)
                     '<table id=' + tableId + '> </table>' +
                     '</div>' +
                     '</div>';
-
             });
 
             switch (authType) {
@@ -123,10 +122,16 @@ function getAuthClassElement(_this) {
                 field: 'createdAt',
                 title: 'Last Updated At'
             } ],
-            height: 400,
+            height: 430,
         });
 
         $(_this).addClass("active");
         $tableDiv.show();
     }
+}
+
+/** 导出全部功能点的rbac json **/
+function exportAll() {
+    var serviceName = $("#serviceList").children(".active").find("a").html();
+    window.location.href = "/auth-file/all-json/" + serviceName;
 }

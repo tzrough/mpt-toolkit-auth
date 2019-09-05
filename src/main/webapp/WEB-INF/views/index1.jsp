@@ -15,24 +15,15 @@
 
 <div class="container col-lg-12" >
     <div class="row">
-        <div id="leftNav" class="col-lg-3">
-
-        </div>
+        <div id="leftNav" class="col-lg-3"> </div>
 
         <!-- 内容 begin -->
-        <div id="content" class="col-lg-9 border">
-            <!-- 内容 头部 -->
-            <div id="contentHeader" class="row" >
-            </div>
-
-            <!-- 内容 数据 -->
-            <div id="contentBody" class="row">
-
-            </div>
-        </div>
+        <div id="content" class="col-lg-9 border"></div>
         <!-- 内容 end -->
-
     </div>
+
+
+</div>
 
 </body>
 </html>

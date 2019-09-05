@@ -55,6 +55,7 @@ public class AuthFileServiceImpl implements AuthFileService {
 
         // 2. 插入权限点数据
         for (AuthClassElement authClassElement : authClassElements) {
+            // 生成 JSON KEY 前缀  format: serviceName.type.range.*
             String keyPrefix = generateRbacKeyPrefix(authClass);
             authClassElement.setTableName(tableName);
             authClassElement.setAuthClassId(authClass.getId());
@@ -63,12 +64,10 @@ public class AuthFileServiceImpl implements AuthFileService {
         }
     }
 
-
     @Override
     public String convertExcel2Json(XSSFWorkbook xssfWorkbook) {
 
         String resultJson;
-        List<AuthJsonElement> authJsonElementList = new ArrayList<>();
 
         XSSFSheet authMetaSheet = xssfWorkbook.getSheetAt(0);
         XSSFSheet authDataSheet = xssfWorkbook.getSheetAt(1);
@@ -79,24 +78,37 @@ public class AuthFileServiceImpl implements AuthFileService {
         // 解析权限点数据
         List<AuthClassElement> authClassElements = this.extractAuthList(authDataSheet);
 
-        if(!CollectionUtils.isEmpty(authClassElements)) {
-            // 生成 JSON KEY 前缀  format: serviceName.type.range.*
-            String keyPrefix = this.generateRbacKeyPrefix(authClass);
+        resultJson = convert2json(authClassElements);
+        return resultJson;
+    }
 
-            for (AuthClassElement ele : authClassElements) {
-                AuthJsonElement authJsonElement = new AuthJsonElement();
+    @Override
+    public String getJsonAll(String serviceName) {
 
-                authJsonElement.setKey(keyPrefix + ele.getAuthElement());
-                authJsonElement.setName(ele.getAuthElementName());
+        String resultJson;
+        List<AuthClassElement> combineList = new ArrayList<>();
 
-                authJsonElementList.add(authJsonElement);
+        AuthClass condition = new AuthClass();
+        condition.setAuthServiceName(serviceName);
+        condition.setIsDeleted(0);
+
+        List<AuthClass> authClassList = authClassDao.getAuthClassList(condition);
+
+        if(!CollectionUtils.isEmpty(authClassList)) {
+            for (AuthClass authClass : authClassList) {
+
+                List<AuthClassElement> authClassElmenetList = authClassElementDao.getAuthClassElmenetList(authClass);
+
+                if(!CollectionUtils.isEmpty(authClassElmenetList)) {
+                    combineList.addAll(authClassElmenetList);
+                }
             }
         }
 
-        resultJson = JSON.toJSONString(authJsonElementList, true);
-
+        resultJson = convert2json(combineList);
         return resultJson;
     }
+
 
     /** 解析权限元数据 **/
     private AuthClass extractAuthMeta(XSSFSheet authMetaSheet){
@@ -186,4 +198,22 @@ public class AuthFileServiceImpl implements AuthFileService {
 
         return keyPrefix.toString();
     }
+
+
+    /** 生成 rbac json **/
+    private String convert2json(List<AuthClassElement> authClassElements){
+
+        List<AuthJsonElement> authJsonElementList = new ArrayList<>();
+
+        if(!CollectionUtils.isEmpty(authClassElements)) {
+            for (AuthClassElement ele : authClassElements) {
+                AuthJsonElement authJsonElement = new AuthJsonElement();
+                authJsonElement.setKey(ele.getRbacKey());
+                authJsonElement.setName(ele.getAuthElementName());
+                authJsonElementList.add(authJsonElement);
+            }
+        }
+       return JSON.toJSONString(authJsonElementList, true);
+    }
+
 }

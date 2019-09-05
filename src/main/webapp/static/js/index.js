@@ -33,7 +33,7 @@ function loadCreatePage() {
     emptyContent();
     $("#nav-left li").removeClass("active");
     $("#authCreate").addClass("active");
-    $("#contentHeader").load("/view/auth/create");
+    $("#content").load("/view/auth/create");
 }
 
 
@@ -67,5 +67,5 @@ function loadAuthServicePage(_this) {
     emptyContent();
     $("#nav-left li").removeClass("active");
     $(_this).parents().addClass("active");
-    $("#contentBody").load("/view/auth/service");
+    $("#content").load("/view/auth/service");
 }
