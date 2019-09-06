@@ -43,7 +43,7 @@ public class AuthFileServiceImpl implements AuthFileService {
         authClassDao.insertAuthClass(authClass);
 
         // 解析权限点数据
-        List<AuthClassElement> authClassElements = this.extractAuthList(authDataSheet);
+        List<AuthClassElement> authClassElements = this.extractAuthList(authDataSheet, authClass);
 
         String dbName = "mpt_toolkit_auth";
         String tableName = authClass.getAuthTableName();
@@ -55,11 +55,8 @@ public class AuthFileServiceImpl implements AuthFileService {
 
         // 2. 插入权限点数据
         for (AuthClassElement authClassElement : authClassElements) {
-            // 生成 JSON KEY 前缀  format: serviceName.type.range.*
-            String keyPrefix = generateRbacKeyPrefix(authClass);
             authClassElement.setTableName(tableName);
             authClassElement.setAuthClassId(authClass.getId());
-            authClassElement.setRbacKey(keyPrefix + authClassElement.getAuthElement());
             authClassElementDao.insertSelective(authClassElement);
         }
     }
@@ -76,7 +73,7 @@ public class AuthFileServiceImpl implements AuthFileService {
         AuthClass authClass = this.extractAuthMeta(authMetaSheet);
 
         // 解析权限点数据
-        List<AuthClassElement> authClassElements = this.extractAuthList(authDataSheet);
+        List<AuthClassElement> authClassElements = this.extractAuthList(authDataSheet, authClass);
 
         resultJson = convert2json(authClassElements);
         return resultJson;
@@ -146,7 +143,7 @@ public class AuthFileServiceImpl implements AuthFileService {
     }
 
     /** 解析权限点数据 **/
-    private List<AuthClassElement> extractAuthList(XSSFSheet authDataSheet){
+    private List<AuthClassElement> extractAuthList(XSSFSheet authDataSheet, AuthClass authClass){
 
         List<AuthClassElement> authClassElements = new ArrayList<>();
 
@@ -161,11 +158,14 @@ public class AuthFileServiceImpl implements AuthFileService {
 
             AuthClassElement authClassEle = new AuthClassElement();
 
+            // 生成 JSON KEY 前缀  format: serviceName.type.range.*
+            String keyPrefix = generateRbacKeyPrefix(authClass);
             String authEleName = authEleRow.getCell(0).getStringCellValue();
             String authEle = authEleRow.getCell(1).getStringCellValue();
 
             authClassEle.setAuthElementName(authEleName);
             authClassEle.setAuthElement(authEle);
+            authClassEle.setRbacKey(keyPrefix + authEle);
 
             authClassElements.add(authClassEle);
         }

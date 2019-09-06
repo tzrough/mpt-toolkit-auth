@@ -14,14 +14,16 @@
  Date: 04/09/2019 17:06:21
 */
 
+CREATE database mpt_toolkit_auth;
+
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
 
 -- ----------------------------
 -- Table structure for auth_class
 -- ----------------------------
-DROP TABLE IF EXISTS `auth_class`;
-CREATE TABLE `auth_class` (
+DROP TABLE IF EXISTS mpt_toolkit_auth.`auth_class`;
+CREATE TABLE mpt_toolkit_auth.`auth_class` (
   `id` bigint(11) NOT NULL AUTO_INCREMENT COMMENT '主键 id',
   `auth_service_name` varchar(64) NOT NULL COMMENT '权限所属应用',
   `auth_type` int(1) NOT NULL COMMENT '权限类型 1: function  2: data',

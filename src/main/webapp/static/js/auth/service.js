@@ -1,6 +1,11 @@
 $(function(){
     // 初始化权限模块折叠功能
     initAuthClassList();
+
+    $('#addModal').on('hidden.bs.modal', function () {
+        $("#authElementName").val(null);
+        $("#rbacKey").val(null);
+    });
 });
 
 
@@ -82,13 +87,31 @@ function getAuthClassList(authType)
     });
 }
 
-
 /**
  * 获取指定权限模块下权限点
  **/
 function getAuthClassElement(_this) {
+
     var $tableDiv = $($(_this).next());
     var $table = $($(_this).next().children("table"));
+    var tableId = $table.attr("id");
+
+    var toolbar = $(
+        '<div id="toolbar" >' +
+            '<button id="add" class="btn btn-info"  onclick="popAddModal(\'' + tableId + '\')">' +
+                '<i class="glyphicon glyphicon-plus"></i> ADD' +
+            '</button>' +
+            '<button id="edit" class="btn btn-info" onclick="edit(\'' + tableId + '\')">' +
+                '<i class="glyphicon glyphicon-pencil"></i> EDIT(Enable/Disable)' +
+            '</button>' +
+            '<button id="del" class="btn btn-danger" >' +
+                '<i class="glyphicon glyphicon-minus"></i> DELETE' +
+            '</button>' +
+            '<button id="save" class="btn btn-success" >' +
+                ' <i class="glyphicon glyphicon-ok"></i> SAVE' +
+            '</button>' +
+        '</div>'
+    );
 
     var url = "/auth-class/element"
     var condition = {};
@@ -107,22 +130,34 @@ function getAuthClassElement(_this) {
             queryParams: function (params) {
                 return condition;
             },
+            toolbar: toolbar,
             pagination: false,
+            showFullscreen: true,
             columns: [{
                 title: 'Number',
                 formatter: function (value, row, index) {
                     return index+1;
                 }}, {
                 field: 'authElementName',
-                title: 'Rbac Name'
+                title: 'Rbac Name',
+                editable: {
+                    disabled:true
+                }
             }, {
                 field: 'rbacKey',
-                title: 'Rbac Key'
+                title: 'Rbac Key',
+                editable: {
+                    disabled:true
+                }
             }, {
                 field: 'createdAt',
                 title: 'Last Updated At'
             } ],
             height: 430,
+            onEditableSave: function (field, row, oldValue, $el) {
+                //$table.class(".editable").editable('toggleDisabled');
+            }
+
         });
 
         $(_this).addClass("active");
@@ -135,3 +170,42 @@ function exportAll() {
     var serviceName = $("#serviceList").children(".active").find("a").html();
     window.location.href = "/auth-file/all-json/" + serviceName;
 }
+
+/** 弹出新增框 **/
+function popAddModal(tableId) {
+    $("#addModal").modal('show');
+    $("#addModal").attr("tableId", tableId);
+
+}
+
+
+function addRow() {
+    var tableId =  $("#addModal").attr("tableId");
+    $table = $("#" + tableId);
+
+    var authElementName = $("#authElementName").val();
+    var rbacKey = $("#rbacKey").val();
+
+    if(authElementName == "" || rbacKey == "") {
+        alert("no empty filed allowed");
+        return;
+    }
+
+    $table.bootstrapTable('insertRow', {
+        index: 0,
+        row: {
+            authElementName: authElementName,
+            rbacKey: rbacKey,
+            createdAt: ""
+        }
+    })
+
+    $("#addModal").modal('hide');
+}
+
+
+function edit(tableId) {
+    $('#' + tableId + ' .editable').editable('toggleDisabled');
+}
+
+
