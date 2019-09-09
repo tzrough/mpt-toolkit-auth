@@ -107,7 +107,7 @@ function getAuthClassElement(_this) {
             '<button id="del" class="btn btn-danger" >' +
                 '<i class="glyphicon glyphicon-minus"></i> DELETE' +
             '</button>' +
-            '<button id="save" class="btn btn-success" >' +
+            '<button id="save" class="btn btn-success" onclick="save(\'' + tableId + '\')">' +
                 ' <i class="glyphicon glyphicon-ok"></i> SAVE' +
             '</button>' +
         '</div>'
@@ -137,25 +137,31 @@ function getAuthClassElement(_this) {
                 title: 'Number',
                 formatter: function (value, row, index) {
                     return index+1;
-                }}, {
+                }},{
+                field: 'authElement',
+                title: 'Auth Point',
+                editable: {
+                    disabled: false
+                }
+            }, {
                 field: 'authElementName',
                 title: 'Rbac Name',
                 editable: {
-                    disabled:true
+                    disabled: false
                 }
             }, {
                 field: 'rbacKey',
                 title: 'Rbac Key',
                 editable: {
-                    disabled:true
+                    disabled: false
                 }
-            }, {
+            },{
                 field: 'createdAt',
                 title: 'Last Updated At'
             } ],
             height: 430,
             onEditableSave: function (field, row, oldValue, $el) {
-                //$table.class(".editable").editable('toggleDisabled');
+                $('#' + tableId + ' .editable').editable('enable');
             }
 
         });
@@ -183,10 +189,11 @@ function addRow() {
     var tableId =  $("#addModal").attr("tableId");
     $table = $("#" + tableId);
 
+    var authElement = $("#authElement").val();
     var authElementName = $("#authElementName").val();
     var rbacKey = $("#rbacKey").val();
 
-    if(authElementName == "" || rbacKey == "") {
+    if(authElement == "" || authElementName == "" || rbacKey == "") {
         alert("no empty filed allowed");
         return;
     }
@@ -196,6 +203,7 @@ function addRow() {
         row: {
             authElementName: authElementName,
             rbacKey: rbacKey,
+            authElement: authElement,
             createdAt: ""
         }
     })
@@ -206,6 +214,55 @@ function addRow() {
 
 function edit(tableId) {
     $('#' + tableId + ' .editable').editable('toggleDisabled');
+}
+
+/** 保存修改的内容 **/
+function save(tableId) {
+    var data = $('#' + tableId).bootstrapTable('getData');
+    var url = "/auth-class/save";
+    // 从 authClass 后开始截取
+    var authClassId = tableId.substring(9, tableId.indexOf("Table"));
+
+    /** 添加权限模块id **/
+    $.each(data,function (index, item) {
+        item.authClassId = authClassId;
+    })
+
+    if($.isEmptyObject(data)) {
+        alert("please add content");
+        return;
+    }
+    // 保存表格数据
+    $.ajax({
+        url: url,
+        type: "post",
+        contentType : "application/json",
+        data: JSON.stringify(data),
+        dataType:"json",
+        success:function(newAuthClass){
+            var condition = {};
+            condition.id = newAuthClass.id;
+            condition.authTableName = newAuthClass.authTableName;
+
+            // 重新加载表格数据
+            $.ajax({
+                url: "/auth-class/element",
+                type: "post",
+                contentType : "application/json",
+                data: JSON.stringify(condition),
+                success:function(data){
+                    $('#' + tableId).bootstrapTable("load",data);
+                },
+                error:function(e){
+                }});
+        },
+        error:function(e){
+            alert("error");
+        }});
+
+
+
+
 }
 
 

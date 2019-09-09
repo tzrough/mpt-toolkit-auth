@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.OutputStream;
 
 
 @Controller
@@ -25,9 +24,7 @@ public class AuthFileController {
 
     @GetMapping(value = "excel-upload")
     public void excelUpload(@RequestParam(name = "filePath", defaultValue = "") String filePath, HttpServletResponse response) throws IOException {
-
         XSSFWorkbook xssfWorkbook = new XSSFWorkbook(filePath);
-
         authFileService.saveExcel2DB(xssfWorkbook);
     }
 

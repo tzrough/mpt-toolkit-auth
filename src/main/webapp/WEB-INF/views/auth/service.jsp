@@ -48,6 +48,10 @@
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
+                        <label>Auth Point</label>
+                        <input id="authElement" type="text" class="form-control" name="" placeholder="">
+                    </div>
+                    <div class="form-group">
                         <label>Rbac Name</label>
                         <input id="authElementName" type="text" class="form-control" placeholder="">
                     </div>

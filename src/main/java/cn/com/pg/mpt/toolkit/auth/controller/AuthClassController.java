@@ -8,6 +8,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,5 +31,15 @@ public class AuthClassController {
         List<AuthClassElement> authClassElementList = authClassElementService.getAuthClassElmenetList(condition);
 
         return new ResponseEntity<>(authClassElementList, new HttpHeaders(), HttpStatus.OK);
+    }
+
+    /** 更新、存储权限模块下权限点 **/
+    @PostMapping(value = "/save")
+    public ResponseEntity<AuthClass> saveAuthClassList(@RequestBody List<AuthClassElement> authClassElementList) {
+        if(CollectionUtils.isEmpty(authClassElementList)) {
+            return new ResponseEntity(null, new HttpHeaders(), HttpStatus.BAD_REQUEST);
+        }
+        AuthClass authClass = authClassElementService.saveAuthClassList(authClassElementList);
+        return new ResponseEntity(authClass, new HttpHeaders(), HttpStatus.OK);
     }
 }

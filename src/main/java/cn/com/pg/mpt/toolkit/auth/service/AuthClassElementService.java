@@ -11,4 +11,7 @@ public interface AuthClassElementService
      * 获取权限模块下权限点
      **/
     List<AuthClassElement> getAuthClassElmenetList(AuthClass condition);
+
+    /** 更新、存储权限模块下权限点 **/
+    AuthClass saveAuthClassList(List<AuthClassElement> authClassElementList);
 }
