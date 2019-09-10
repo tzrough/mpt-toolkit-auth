@@ -199,7 +199,6 @@ Editableform is linked with one of input types, e.g. 'text', 'select' etc.
         submit: function(e) {
             e.stopPropagation();
             e.preventDefault();
-            
             //get new value from input
             var newValue = this.input.input2value(); 
 

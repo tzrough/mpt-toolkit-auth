@@ -83,7 +83,7 @@ $.BootstrapTable = class extends $.BootstrapTable {
     })
   }
 
-  initBody (fixedScroll) {
+  initBody (fixedScroll, save) {
     super.initBody(fixedScroll)
 
     if (!this.options.editable) {
@@ -104,6 +104,9 @@ $.BootstrapTable = class extends $.BootstrapTable {
         const index = $tr.data('index')
         const row = data[index]
 
+        if(save)
+        column.editable = {};
+
         const editableOpts = Utils.calculateObjectValue(column,
           column.editable, [index, row, $element], {})
 
@@ -120,7 +123,7 @@ $.BootstrapTable = class extends $.BootstrapTable {
         $this.data('value', submitValue)
         row[column.field] = submitValue
         this.trigger('editable-save', column.field, row, rowIndex, oldValue, $this)
-        this.initBody()
+        this.initBody(null,true);
       })
 
       $field.off('shown').on('shown', ({currentTarget}, editable) => {

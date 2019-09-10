@@ -14,3 +14,5 @@ function emptyContentHeader() {
 function emptyContentBody() {
     $("#contentBody").empty();
 }
+
+

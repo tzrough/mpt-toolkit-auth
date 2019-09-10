@@ -98,22 +98,18 @@ function getAuthClassElement(_this) {
 
     var toolbar = $(
         '<div id="toolbar" >' +
-            '<button id="add" class="btn btn-info"  onclick="popAddModal(\'' + tableId + '\')">' +
-                '<i class="glyphicon glyphicon-plus"></i> ADD' +
+            '<button id="edit" class="btn btn-success" onclick="edit(\'' + tableId + '\', this, false)">' +
+                'Enable-Edit' +
             '</button>' +
-            '<button id="edit" class="btn btn-info" onclick="edit(\'' + tableId + '\')">' +
-                '<i class="glyphicon glyphicon-pencil"></i> EDIT(Enable/Disable)' +
+            '<button id="add" class="btn btn-info hide"  onclick="popAddModal(\'' + tableId + '\')">' +
+                '<i class="glyphicon glyphicon-plus"></i> Add' +
             '</button>' +
-            '<button id="del" class="btn btn-danger" >' +
-                '<i class="glyphicon glyphicon-minus"></i> DELETE' +
-            '</button>' +
-            '<button id="save" class="btn btn-success" onclick="save(\'' + tableId + '\')">' +
-                ' <i class="glyphicon glyphicon-ok"></i> SAVE' +
+            '<button id="save" class="btn btn-success hide" onclick="save(\'' + tableId + '\', this)">' +
+                ' <i class="glyphicon glyphicon-ok"></i> Save' +
             '</button>' +
         '</div>'
     );
 
-    var url = "/auth-class/element"
     var condition = {};
     condition.id = $(_this).attr("classId");
     condition.authTableName = $(_this).attr("tableName");
@@ -124,6 +120,7 @@ function getAuthClassElement(_this) {
         $tableDiv.hide();
         // 未点击状态
     } else {
+        var url = "/auth-class/element";
         $table.bootstrapTable({
             url: url,
             method: "post",
@@ -140,36 +137,46 @@ function getAuthClassElement(_this) {
                 }},{
                 field: 'authElement',
                 title: 'Auth Point',
-                editable: {
-                    disabled: false
-                }
             }, {
                 field: 'authElementName',
                 title: 'Rbac Name',
                 editable: {
-                    disabled: false
+                    disabled: true
                 }
             }, {
                 field: 'rbacKey',
                 title: 'Rbac Key',
                 editable: {
-                    disabled: false
+                    disabled: true
                 }
-            },{
+            }, {
                 field: 'createdAt',
                 title: 'Last Updated At'
-            } ],
+            }, {
+                field: 'operate',
+                title: 'Remove',
+                align: 'center',
+                visible: false,
+                events: {
+                    'click .remove': function (e, value, row, index) {
+                        $table.bootstrapTable('remove', {
+                            field: 'id',
+                            values: [row.id]
+                        })
+                    }
+                },
+                formatter: operateFormatter,
+            }],
             height: 430,
-            onEditableSave: function (field, row, oldValue, $el) {
-                $('#' + tableId + ' .editable').editable('enable');
+            onEditableSave: function(field, row, rowIndex, oldValue, $el) {
             }
-
         });
-
         $(_this).addClass("active");
         $tableDiv.show();
     }
 }
+
+
 
 /** 导出全部功能点的rbac json **/
 function exportAll() {
@@ -181,7 +188,6 @@ function exportAll() {
 function popAddModal(tableId) {
     $("#addModal").modal('show');
     $("#addModal").attr("tableId", tableId);
-
 }
 
 
@@ -211,13 +217,44 @@ function addRow() {
     $("#addModal").modal('hide');
 }
 
-
-function edit(tableId) {
-    $('#' + tableId + ' .editable').editable('toggleDisabled');
+/** 启用编辑 **/
+function edit(tableId, _this, save) {
+    var content = $(_this).html().trim();
+    // 编辑按钮状态切换
+    if(content == "Enable-Edit") {
+        $(_this).html("Disable-Edit");
+        $(_this).removeClass("btn-success").addClass("btn-danger");
+        $(_this).siblings().removeClass("hide");
+        $("#" + tableId).bootstrapTable('showColumn', 'operate');
+        $('#' + tableId + ' .editable').editable('enable');
+    }else {
+        // 若不是通过保存来关闭编辑
+        if(!save) {
+            bootbox.confirm({
+                size: "small",
+                message: "Are you sure not to save?",
+                /* result is a boolean; true = OK, false = Cancel*/
+                callback: function(yes){
+                    if(yes) {
+                        $(_this).html("Enable-Edit");
+                        $(_this).removeClass("btn-danger").addClass("btn-success");
+                        $(_this).siblings().addClass("hide");
+                        $("#" + tableId).bootstrapTable('hideColumn', 'operate');
+                    }
+                }
+            })
+        }else {
+            $(_this).html("Enable-Edit");
+            $(_this).removeClass("btn-danger").addClass("btn-success");
+            $(_this).siblings().addClass("hide");
+            $("#" + tableId).bootstrapTable('hideColumn', 'operate');
+            $('#' + tableId + ' .editable').editable('toggleDisabled');
+        }
+    }
 }
 
 /** 保存修改的内容 **/
-function save(tableId) {
+function save(tableId, _this) {
     var data = $('#' + tableId).bootstrapTable('getData');
     var url = "/auth-class/save";
     // 从 authClass 后开始截取
@@ -244,6 +281,8 @@ function save(tableId) {
             condition.id = newAuthClass.id;
             condition.authTableName = newAuthClass.authTableName;
 
+            toastr.success('data save succeed');
+            edit(tableId, $(_this).siblings("#edit"), true);
             // 重新加载表格数据
             $.ajax({
                 url: "/auth-class/element",
@@ -257,12 +296,19 @@ function save(tableId) {
                 }});
         },
         error:function(e){
-            alert("error");
+            toastr.error('data save failed');
         }});
-
-
-
-
 }
+
+
+/** 表格行操作 **/
+function operateFormatter(value, row, index) {
+    return [
+        '<a class="remove" href="javascript:void(0)" title="Remove" >',
+        '<i class="fa fa-trash"></i>',
+        '</a>'
+    ].join('')
+}
+
 
 
